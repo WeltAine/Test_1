@@ -2,37 +2,71 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : LivingEntity
+
+namespace NewCode
 {
-    public enum State { Idle, Move}
-    public State state = State.Idle;
-
-    public float moveSpead = 5.0f;
-
-    public override void OnDie()
+    public class Enemy : LivingEntity, IDamageable, IMove
     {
-        base.OnDie();
 
-        GameObject.Destroy(this.gameObject);
-    }
+        public float moveSpead = 5.0f;
 
-    public void Move()
-    {
-        this.transform.Translate(moveSpead * Time.deltaTime * Vector3.forward);
-    }
+        public override void OnDie()
+        {
+            Debug.Log("Enemy is Die");
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+            base.OnDie();
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(state == State.Move)
+            this.transform.parent.GetComponent<EnemyGroup>().members.Remove(this.transform);
+            GameObject.Destroy(this.gameObject);
+        }
+
+        public void Move()
+        {
+            this.transform.Translate(moveSpead * Time.deltaTime * Vector3.forward);
+        }
+
+
+
+        // Start is called before the first frame update
+        void Start()
+        {
+            
+        }
+
+        // Update is called once per frame
+        void Update()
         {
             Move();
+        }
+
+        public void TakeHit(float damage, GameObject attacker)
+        {
+            TakeHit(damage);
+        }
+
+        public void TakeHit(float damage)
+        {
+            Debug.Log("Enemy Call TakeHit");
+
+            if (!isDead)
+            {
+                health -= damage;
+                if (health <= 0)
+                {
+                    isDead = true;
+                    OnDie();
+                }
+            }
+
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if(collision.gameObject.layer != this.gameObject.layer)
+            {
+                Debug.Log("ZZZ");
+                collision.gameObject.GetComponent<IDamageable>().TakeHit(1, this.gameObject);
+            }
         }
     }
 }

@@ -48,7 +48,9 @@ public class PlayerSpawner : MonoBehaviour
             Vector3 direction = aim.transform.localPosition.normalized;
             if (Mathf.Approximately(direction.magnitude, float.Epsilon))
             {
-                direction = Vector3.right;
+                //direction = Vector3.right;
+                Vector2 randomDirection = Random.insideUnitCircle.normalized;
+                direction = new Vector3(randomDirection.x, 0, randomDirection.y);
             }
             Debug.Log(direction);
             aim.transform.Translate(direction * 0.5f, Space.World);

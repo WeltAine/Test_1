@@ -3,48 +3,51 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Projectile : MonoBehaviour
+namespace NewCode
 {
-    public LayerMask layerMask;
-
-    public float damage = 1f;//子弹伤害
-
-    public float velocity = 20f;//子弹射速
-
-    private float currentDistance = 0f;//行程
-    public Action<float, Projectile> RangeExceedHandle;//射程超出事件
-
-
-
-    public void CheckCollision(float distance)
+    public class Projectile : MonoBehaviour
     {
-        Ray ray = new Ray(this.transform.position, this.transform.forward);
-        RaycastHit hit;
-        
 
-        if(Physics.Raycast(ray, out hit, distance, layerMask, QueryTriggerInteraction.Ignore))
+        public LayerMask layerMask;
+
+        public float damage;
+        public float velocity = 20f;//子弹速度
+
+        private float currentDistance = 0f;//行程
+        public Action<float, Projectile> OnRangeExceed;//射程超出事件
+        //public Action<IDamageable> OnDamage;
+
+
+        public void CheckCollision(float distance)
         {
-            //LivingEntity aim = hit.collider.GetComponent<LivingEntity>() ?? null;
-            IDamageable aim = hit.collider.GetComponent<IDamageable>() ?? null;
-            aim?.TakeHit(damage);
-            GameObject.Destroy(this.gameObject);
+            Ray ray = new Ray(this.transform.position, this.transform.forward);
+            RaycastHit hit;
+
+
+            if (Physics.Raycast(ray, out hit, distance, layerMask, QueryTriggerInteraction.Ignore))
+            {
+                IDamageable aim = hit.collider.GetComponent<IDamageable>() ?? null;
+                //OnDamage?.Invoke(aim);
+                aim?.TakeHit(damage);
+                GameObject.Destroy(this.gameObject);
+            }
         }
-    }
 
+        // Start is called before the first frame update
+        void Start()
+        {
 
-    // Start is called before the first frame update
-    void Start()   
-    {
-        
-    }
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        float moveDistance = Time.deltaTime * velocity;
-        CheckCollision(moveDistance);
-        this.transform.Translate(this.transform.forward * moveDistance, Space.World);
-        currentDistance += moveDistance;
-        RangeExceedHandle?.Invoke(currentDistance, this);
+        // Update is called once per frame
+        void Update()
+        {
+            float moveDistance = Time.deltaTime * velocity;
+            CheckCollision(moveDistance);
+            this.transform.Translate(this.transform.forward * moveDistance, Space.World);
+            currentDistance += moveDistance;
+            OnRangeExceed?.Invoke(currentDistance, this);
+
+        }
     }
 }

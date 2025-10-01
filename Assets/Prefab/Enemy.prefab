@@ -123,4 +123,4 @@ MonoBehaviour:
   health: 1
   isDead: 0
   state: 0
-  moveSpead: 3
+  moveSpead: 4

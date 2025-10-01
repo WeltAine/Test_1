@@ -18,6 +18,7 @@ public class SoliderReward : Reward
     {
         //以触发器的方式毁坏并给与奖励（TakeHit将只会调用回调）
         //parent.GetComponent<LivingEntity>().DeathHandle += GiveReward;
+
     }
 
     // Update is called once per frame
